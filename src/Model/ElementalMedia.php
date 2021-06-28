@@ -66,6 +66,8 @@ class ElementalMedia extends BaseElement
     {
         parent::onBeforeWrite();
 
+        $this->Video = trim($this->Video);
+
         MediaField::saveEmbed($this, 'Video', 'VideoEmbedURL', 'VideoType');
     }
 
