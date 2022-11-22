@@ -1,3 +1,5 @@
-/node_modules/
-/**/*.js.map
-/**/*.css.map
+node_modules
+vendor
+composer.lock
+.php-cs-fixer.cache
+.idea
