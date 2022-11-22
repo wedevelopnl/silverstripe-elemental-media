@@ -6,22 +6,28 @@ use DNADesign\Elemental\Models\BaseElement;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Image;
 use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextField;
+use SilverStripe\View\Requirements;
 use WeDevelop\MediaField\Form\MediaField;
 
 /**
  * @property string $MediaType
- * @property string $Video
- * @property string $VideoRatio
- * @property string $VideoEmbedURL
- * @property string $VideoType
- * @property string $EmbedName
- * @property string $EmbedDescription
- * @property string $EmbedImage
- * @property string $EmbedCreated
  * @property string $MediaCaption
+ * @property string $MediaRatio
+ *
+ * @property string $MediaVideoShortURL
+ * @property string $MediaVideoFullURL
+ * @property string $MediaVideoProvider
+ *
+ * @property string $MediaVideoEmbeddedName
+ * @property string $MediaVideoEmbeddedDescription
+ * @property string $MediaVideoEmbeddedThumbnail
+ * @property string $MediaVideoEmbeddedCreated
+ *
  */
 class ElementalMedia extends BaseElement
 {
@@ -43,35 +49,32 @@ class ElementalMedia extends BaseElement
     /** @config */
     private static string $plural_name = 'Media blocks';
 
-    public function getType(): string
-    {
-        return _t(__CLASS__ . '.BlockType', 'Media');
-    }
-
     /** @config */
     private static array $db = [
-        'MediaType' => 'Varchar',
-        'Video' => 'Varchar',
-        'VideoRatio' => 'Varchar(10)',
-        'VideoEmbedURL' => 'Varchar',
-        'VideoType' => 'Varchar',
-        'EmbedName' => 'Varchar(255)',
-        'EmbedDescription' => 'Text',
-        'EmbedImage' => 'Varchar(255)',
-        'EmbedCreated' => 'Varchar(255)',
+        'MediaType' => 'Varchar(5)',
         'MediaCaption' => 'Varchar(255)',
+        'MediaRatio' => 'Varchar(10)',
+
+        'MediaVideoFullURL' => 'Varchar(255)',
+        'MediaVideoProvider' => 'Varchar(10)',
+
+        'MediaVideoEmbeddedName' => 'Varchar(255)',
+        'MediaVideoEmbeddedURL' => 'Varchar(255)',
+        'MediaVideoEmbeddedDescription' => 'Text',
+        'MediaVideoEmbeddedThumbnail' => 'Varchar(255)',
+        'MediaVideoEmbeddedCreated' => 'Varchar(255)',
     ];
 
     /** @config */
     private static array $has_one = [
         'MediaImage' => Image::class,
-        'MediaThumbnail' => Image::class,
+        'MediaVideoCustomThumbnail' => Image::class,
     ];
 
     /** @config */
     private static array $owns = [
         'MediaImage',
-        'MediaThumbnail',
+        'MediaVideoCustomThumbnail',
     ];
 
     private static array $mediaRatios = [
@@ -86,35 +89,48 @@ class ElementalMedia extends BaseElement
         $fields = parent::getCMSFields();
 
         $fields->removeByName([
-            'VideoEmbedURL',
-            'VideoType',
-            'VideoRatio',
-            'EmbedName',
-            'EmbedDescription',
-            'EmbedImage',
-            'EmbedCreated',
-            'MediaThumbnail',
-            'Image',
+            'MediaType',
             'MediaCaption',
+            'MediaRatio',
+
+            'MediaVideoShortURL',
+            'MediaVideoFullURL',
+            'MediaVideoProvider',
+            'MediaVideoCustomThumbnail',
+
+            'MediaVideoEmbeddedName',
+            'MediaVideoEmbeddedURL',
+            'MediaVideoEmbeddedDescription',
+            'MediaVideoEmbeddedThumbnail',
+            'MediaVideoEmbeddedCreated',
         ]);
 
-        $fields->addFieldsToTab('Root.Main', [
-            $mediaField = new MediaField($fields, 'MediaType', 'MediaImage', 'Video', 'MediaBlocks'),
-        ]);
-
-        $mediaField->getVideoWrapper()->push(DropdownField::create('VideoRatio', 'Video ratio', self::$mediaRatios)->setEmptyString('16x9 (Default)'));
-        $mediaField->getVideoWrapper()->push(TextField::create('MediaCaption', 'Caption text'));
+        $mediaField = MediaField::create($fields);
         $mediaField->getVideoWrapper()->push(
-            UploadField::create('MediaThumbnail', 'Custom thumbnail')
-            ->setDescription('This overwrites the default thumbnail provided by youtube or vimeo')
-            ->displayIf('MediaType')->isEqualTo('video')->end()
+            UploadField::create('MediaVideoCustomThumbnail', 'Custom video thumbnail')
+                ->setFolderName('MediaUploads')
+                ->setDescription('This overwrites the default thumbnail provided by youtube or vimeo')
         );
 
-        $fields->addFieldsToTab('Root.VideoData', [
-            ReadonlyField::create('EmbedDescription', 'Description'),
-            ReadonlyField::create('EmbedImage', 'Image'),
-            ReadonlyField::create('EmbedCreated', 'Created'),
+        $fields->addFieldsToTab('Root.Main', [
+            $mediaField,
+            TextField::create('MediaCaption', 'Caption text'),
+            DropdownField::create('MediaRatio', 'Media ratio', self::$mediaRatios)->setEmptyString('16x9 (Default)')
         ]);
+
+        if ($this->MediaType === 'video') {
+            $fields->addFieldsToTab('Root.VideoEmbeddedData', [
+                ReadonlyField::create('MediaVideoEmbeddedURL', 'Shortened URL'),
+                ReadonlyField::create('MediaVideoProvider', 'Video provider'),
+                ReadonlyField::create('MediaVideoEmbeddedName', 'Embedded name'),
+                ReadonlyField::create('MediaVideoEmbeddedDescription', 'Embedded description'),
+                ReadonlyField::create('MediaVideoEmbeddedThumbnail', 'Embedded thumbnail URL'),
+                FieldGroup::create([
+                    LiteralField::create('MediaVideoEmbeddedThumbnailPreview', '<img src="' . $this->MediaVideoEmbeddedThumbnail . '">', 'Embedded thumbnail'),
+                ])->setTitle('Video Thumbnail'),
+                ReadonlyField::create('MediaVideoEmbeddedCreated', 'Embedded publication date'),
+            ]);
+        }
 
         return $fields;
     }
@@ -123,20 +139,10 @@ class ElementalMedia extends BaseElement
     {
         parent::onBeforeWrite();
 
-        if ($this->Video) {
-            $this->Video = trim($this->Video);
-            MediaField::saveEmbed($this, 'Video', 'VideoEmbedURL', 'VideoType' , 'EmbedName', 'EmbedDescription', 'EmbedImage', 'EmbedCreated');
-        } else {
-            $this->owner->EmbedName = '';
-            $this->owner->EmbedDescription = '';
-            $this->owner->EmbedImage = '';
-            $this->owner->EmbedCreated = '';
+        if ($this->MediaType === 'video' && $this->MediaVideoFullURL) {
+            $this->MediaVideoFullURL = trim($this->MediaVideoFullURL);
+            MediaField::saveEmbed($this);
         }
-    }
-
-    public function BulmaVideoRatio(): string
-    {
-        return $this->VideoRatio === '4x3' ? '4by3' : '16by9';
     }
 
     public function forTemplate($holder = true): ?string
@@ -144,5 +150,10 @@ class ElementalMedia extends BaseElement
         Requirements::javascript('wedevelopnl/silverstripe-elemental-media:client/dist/main.js');
 
         return parent::forTemplate();
+    }
+
+    public function getType(): string
+    {
+        return 'Media';
     }
 }

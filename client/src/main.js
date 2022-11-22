@@ -9,19 +9,20 @@ window.addEventListener('DOMContentLoaded', () => {
     const videoOverlay = videoWrapper.querySelector('.video-overlay');
     if (videoOverlay) {
       videoOverlay.addEventListener('click', () => {
-        videoOverlay.classList.add('d-none');
-        videoOverlay.parentNode.classList.add('no-clip');
+        videoOverlay.classList.add('is-hidden', 'd-none');
       });
     }
 
     // GET DATA
     const { videoType, videoEmbedUrl, elementId } = videoWrapper.dataset;
 
-    if (videoType === 'youtube') {
+    console.log(videoWrapper.dataset);
+
+    if (videoType === 'YouTube') {
       // GET VIDEO ID
       const videoID = videoEmbedUrl.substring(
-        videoEmbedUrl.indexOf('embed/') + 6,
-        videoEmbedUrl.lastIndexOf('?feature'),
+          videoEmbedUrl.indexOf('embed/') + 6,
+          videoEmbedUrl.lastIndexOf('?feature'),
       );
 
       // REPLACE DIV FOR VIDEO
@@ -38,11 +39,11 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    if (videoType === 'vimeo') {
+    if (videoType === 'Vimeo') {
       // GET VIDEO ID
       const videoID = videoEmbedUrl.substring(
-        videoEmbedUrl.indexOf('video/') + 6,
-        videoEmbedUrl.lastIndexOf('?h='),
+          videoEmbedUrl.indexOf('video/') + 6,
+          videoEmbedUrl.lastIndexOf('?h='),
       );
 
       // REPLACE DIV FOR VIDEO
