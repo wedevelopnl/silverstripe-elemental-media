@@ -139,7 +139,7 @@ class ElementalMedia extends BaseElement
         return $this->VideoRatio === '4x3' ? '4by3' : '16by9';
     }
 
-    public function forTemplate(): DBHTMLText
+    public function forTemplate($holder = true): ?string
     {
         Requirements::javascript('wedevelopnl/silverstripe-elemental-media:client/dist/main.js');
 
