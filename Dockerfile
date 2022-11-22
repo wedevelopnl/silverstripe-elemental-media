@@ -14,7 +14,7 @@ COPY --from=node /usr/local/bin/node /usr/local/bin/node
 COPY --from=node /usr/local/lib/node_modules /usr/local/lib/node_modules
 RUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
 
-COPY package.json yarn.lock webpack.config.js .eslintrc.js .eslintignore .stylelintignore stylelint.config.js ./
+COPY package.json yarn.lock webpack.config.js .eslintrc.js .eslintignore ./
 RUN yarn install
 RUN rm -rf node_modules
 
