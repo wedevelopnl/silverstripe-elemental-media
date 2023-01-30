@@ -5,6 +5,7 @@ namespace WeDevelop\ElementalMedia\Model;
 use DNADesign\Elemental\Models\BaseElement;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Image;
+use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
@@ -12,6 +13,7 @@ use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\View\Requirements;
+use UncleCheese\DisplayLogic\Forms\Wrapper;
 use WeDevelop\MediaField\Form\MediaField;
 
 /**
@@ -57,6 +59,7 @@ class ElementalMedia extends BaseElement
 
         'MediaVideoFullURL' => 'Varchar(255)',
         'MediaVideoProvider' => 'Varchar(10)',
+        'MediaVideoHasOverlay' => 'Boolean(false)',
 
         'MediaVideoEmbeddedName' => 'Varchar(255)',
         'MediaVideoEmbeddedURL' => 'Varchar(255)',
@@ -78,7 +81,7 @@ class ElementalMedia extends BaseElement
     ];
 
     private static array $mediaRatios = [
-        '' => 'Default',
+        '' => 'Auto (default)',
         '1x1' => '1x1',
         '4x3' => '4x3',
         '16x9' => '16x9',
@@ -97,6 +100,7 @@ class ElementalMedia extends BaseElement
             'MediaVideoFullURL',
             'MediaVideoProvider',
             'MediaVideoCustomThumbnail',
+            'MediaVideoHasOverlay',
 
             'MediaVideoEmbeddedName',
             'MediaVideoEmbeddedURL',
@@ -106,16 +110,22 @@ class ElementalMedia extends BaseElement
         ]);
 
         $mediaField = MediaField::create($fields);
+        $mediaField->setTitle('Video settings');
         $mediaField->getVideoWrapper()->push(
             UploadField::create('MediaVideoCustomThumbnail', 'Custom video thumbnail')
                 ->setFolderName('MediaUploads')
-                ->setDescription('This overwrites the default thumbnail provided by youtube or vimeo')
+                ->setDescription('This overwrites the default thumbnail provided by youtube or vimeo'),
         );
 
         $fields->addFieldsToTab('Root.Main', [
             $mediaField,
+            Wrapper::create([
+                CheckboxField::create('MediaVideoHasOverlay', 'Show overlay on top of video thumbnail'),
+            ])->displayIf('MediaType')->isEqualTo('video')->end(),
             TextField::create('MediaCaption', 'Caption text'),
-            DropdownField::create('MediaRatio', 'Media ratio', self::$mediaRatios)->setEmptyString('16x9 (Default)')
+            DropdownField::create('MediaRatio', 'Media ratio', self::$mediaRatios)
+                ->setEmptyString('Auto (default)')
+                ->setDescription('By default, \'Auto\' will make videos appear as 16x9 ratio, while images will be shown as they are'),
         ]);
 
         if ($this->MediaType === 'video') {
@@ -135,6 +145,15 @@ class ElementalMedia extends BaseElement
         return $fields;
     }
 
+    public function BulmaRatio(): ?string
+    {
+        if (!$this->MediaRatio && $this->MediaType === 'video') {
+            return 'is-16by9';
+        }
+
+        return $this->MediaRatio ? 'is-' . str_replace('x', 'by', $this->MediaRatio) : null;
+    }
+
     public function onBeforeWrite(): void
     {
         parent::onBeforeWrite();
@@ -148,6 +167,7 @@ class ElementalMedia extends BaseElement
     public function forTemplate($holder = true): ?string
     {
         Requirements::javascript('wedevelopnl/silverstripe-elemental-media:client/dist/main.js');
+        Requirements::css('wedevelopnl/silverstripe-elemental-media:client/dist/main.css');
 
         return parent::forTemplate();
     }
