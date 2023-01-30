@@ -19,8 +19,8 @@ window.addEventListener('DOMContentLoaded', () => {
     if (videoType === 'YouTube') {
       // GET VIDEO ID
       const videoID = videoEmbedUrl.substring(
-          videoEmbedUrl.indexOf('embed/') + 6,
-          videoEmbedUrl.lastIndexOf('?feature'),
+        videoEmbedUrl.indexOf('embed/') + 6,
+        videoEmbedUrl.lastIndexOf('?feature'),
       );
 
       // REPLACE DIV FOR VIDEO
@@ -40,8 +40,8 @@ window.addEventListener('DOMContentLoaded', () => {
     if (videoType === 'Vimeo') {
       // GET VIDEO ID
       const videoID = videoEmbedUrl.substring(
-          videoEmbedUrl.indexOf('video/') + 6,
-          videoEmbedUrl.lastIndexOf('?h='),
+        videoEmbedUrl.indexOf('video/') + 6,
+        videoEmbedUrl.lastIndexOf('?h='),
       );
 
       // REPLACE DIV FOR VIDEO
