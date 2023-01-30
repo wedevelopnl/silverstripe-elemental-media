@@ -16,8 +16,6 @@ window.addEventListener('DOMContentLoaded', () => {
     // GET DATA
     const { videoType, videoEmbedUrl, elementId } = videoWrapper.dataset;
 
-    console.log(videoWrapper.dataset);
-
     if (videoType === 'YouTube') {
       // GET VIDEO ID
       const videoID = videoEmbedUrl.substring(
