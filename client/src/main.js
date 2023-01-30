@@ -6,7 +6,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   videoWrappers.forEach((videoWrapper) => {
     // REMOVE OVERLAY ON CLICK
-    const videoOverlay = videoWrapper.querySelector('.video-overlay');
+    const videoOverlay = videoWrapper.querySelector('.video-thumbnail');
     if (videoOverlay) {
       videoOverlay.addEventListener('click', () => {
         videoOverlay.classList.add('is-hidden', 'd-none');
