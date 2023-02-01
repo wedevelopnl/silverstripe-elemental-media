@@ -21,7 +21,7 @@
 <% else_if $MediaType == 'video' && $MediaVideoFullURL && $MediaVideoEmbeddedURL %>
     <% if $MediaCaption %><div class="captionImage"><% end_if %>
     <figure class="video image<% if $BulmaRatio %> $BulmaRatio<% end_if %>" data-video-embed-url="$MediaVideoEmbeddedURL" data-element-id="$ID" data-video-type="$MediaVideoProvider">
-        <div class="video-thumbnail<% if $VideoHasOverlay %> has-overlay<% end_if %>" id="playVideo-$ID" style="background-image: url('<% if $MediaVideoCustomThumbnail %>$MediaVideoCustomThumbnail.FocusFill(1440,800).URL<% else %>$MediaVideoEmbeddedThumbnail<% end_if %>')">
+        <div class="video-thumbnail<% if $MediaVideoHasOverlay %> has-overlay<% end_if %>" id="playVideo-$ID" style="background-image: url('<% if $MediaVideoCustomThumbnail %>$MediaVideoCustomThumbnail.FocusFill(1440,800).URL<% else %>$MediaVideoEmbeddedThumbnail<% end_if %>')">
             <span class="button is-dark is-square">
                 <span class="svg-icon">
                     <% include Icons/Includes/PlayRegular %>
