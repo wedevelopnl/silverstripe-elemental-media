@@ -39,3 +39,6 @@ If you use the Docker environment, you can just run `make yarn-watch` to watch f
 
 #### All make commands
 You can run `make help` to get a list with all available `make` commands.
+
+### Upgrade v2 => v3 
+[upgrade document](docs/UPGRADE_V2_V3.md)
