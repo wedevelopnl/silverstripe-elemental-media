@@ -24,7 +24,7 @@ class MigrateNamespaceTask extends BuildTask
         $counter = 0;
         $totalElements = $elements->count();
 
-        print_r(sprintf("Starting migration of %s elements\n\n", $totalElements));
+        printf("Starting migration of %s elements\n\n", $totalElements);
 
         /** @var BaseElement $element */
         foreach ($elements as $element) {
@@ -39,9 +39,9 @@ class MigrateNamespaceTask extends BuildTask
 
             $counter++;
 
-            print_r(sprintf("Migrated %s of %s elements\n", $counter, $totalElements));
+            printf("Migrated %s of %s elements\n", $counter, $totalElements);
         }
 
-        print_r(sprintf("\n\nMigration done for %s elements!", $counter));
+        printf("\n\nMigration done for %s elements!", $counter);
     }
 }
