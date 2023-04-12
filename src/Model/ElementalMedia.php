@@ -110,7 +110,7 @@ class ElementalMedia extends BaseElement
         ]);
 
         $mediaField = MediaField::create($fields);
-        $mediaField->setTitle('Video settings');
+        $mediaField->setTitle('Media settings');
         $mediaField->getVideoWrapper()->push(
             UploadField::create('MediaVideoCustomThumbnail', 'Custom video thumbnail')
                 ->setFolderName('MediaUploads')
