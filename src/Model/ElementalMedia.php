@@ -89,60 +89,60 @@ class ElementalMedia extends BaseElement
 
     public function getCMSFields(): FieldList
     {
-        $fields = parent::getCMSFields();
+        this->beforeUpdateCMSFields(function (FieldList $fields) {
+            $fields->removeByName([
+                'MediaType',
+                'MediaCaption',
+                'MediaRatio',
 
-        $fields->removeByName([
-            'MediaType',
-            'MediaCaption',
-            'MediaRatio',
+                'MediaVideoShortURL',
+                'MediaVideoFullURL',
+                'MediaVideoProvider',
+                'MediaVideoCustomThumbnail',
+                'MediaVideoHasOverlay',
 
-            'MediaVideoShortURL',
-            'MediaVideoFullURL',
-            'MediaVideoProvider',
-            'MediaVideoCustomThumbnail',
-            'MediaVideoHasOverlay',
-
-            'MediaVideoEmbeddedName',
-            'MediaVideoEmbeddedURL',
-            'MediaVideoEmbeddedDescription',
-            'MediaVideoEmbeddedThumbnail',
-            'MediaVideoEmbeddedCreated',
-        ]);
-
-        $mediaField = MediaField::create($fields);
-        $mediaField->setTitle('Media settings');
-        $mediaField->getVideoWrapper()->push(
-            UploadField::create('MediaVideoCustomThumbnail', 'Custom video thumbnail')
-                ->setFolderName('MediaUploads')
-                ->setDescription('This overwrites the default thumbnail provided by youtube or vimeo'),
-        );
-
-        $fields->addFieldsToTab('Root.Main', [
-            $mediaField,
-            Wrapper::create([
-                CheckboxField::create('MediaVideoHasOverlay', 'Show overlay on top of video thumbnail'),
-            ])->displayIf('MediaType')->isEqualTo('video')->end(),
-            TextField::create('MediaCaption', 'Caption text'),
-            DropdownField::create('MediaRatio', 'Media ratio', self::$mediaRatios)
-                ->setEmptyString('Auto (default)')
-                ->setDescription('By default, \'Auto\' will make videos appear as 16x9 ratio, while images will be shown as they are'),
-        ]);
-
-        if ($this->MediaType === 'video') {
-            $fields->addFieldsToTab('Root.VideoEmbeddedData', [
-                ReadonlyField::create('MediaVideoEmbeddedURL', 'Shortened URL'),
-                ReadonlyField::create('MediaVideoProvider', 'Video provider'),
-                ReadonlyField::create('MediaVideoEmbeddedName', 'Embedded name'),
-                ReadonlyField::create('MediaVideoEmbeddedDescription', 'Embedded description'),
-                ReadonlyField::create('MediaVideoEmbeddedThumbnail', 'Embedded thumbnail URL'),
-                FieldGroup::create([
-                    LiteralField::create('MediaVideoEmbeddedThumbnailPreview', '<img src="' . $this->MediaVideoEmbeddedThumbnail . '">', 'Embedded thumbnail'),
-                ])->setTitle('Video Thumbnail'),
-                ReadonlyField::create('MediaVideoEmbeddedCreated', 'Embedded publication date'),
+                'MediaVideoEmbeddedName',
+                'MediaVideoEmbeddedURL',
+                'MediaVideoEmbeddedDescription',
+                'MediaVideoEmbeddedThumbnail',
+                'MediaVideoEmbeddedCreated',
             ]);
-        }
 
-        return $fields;
+            $mediaField = MediaField::create($fields);
+            $mediaField->setTitle('Video settings');
+            $mediaField->getVideoWrapper()->push(
+                UploadField::create('MediaVideoCustomThumbnail', 'Custom video thumbnail')
+                    ->setFolderName('MediaUploads')
+                    ->setDescription('This overwrites the default thumbnail provided by youtube or vimeo'),
+            );
+
+            $fields->addFieldsToTab('Root.Main', [
+                $mediaField,
+                Wrapper::create([
+                    CheckboxField::create('MediaVideoHasOverlay', 'Show overlay on top of video thumbnail'),
+                ])->displayIf('MediaType')->isEqualTo('video')->end(),
+                TextField::create('MediaCaption', 'Caption text'),
+                DropdownField::create('MediaRatio', 'Media ratio', self::$mediaRatios)
+                    ->setEmptyString('Auto (default)')
+                    ->setDescription('By default, \'Auto\' will make videos appear as 16x9 ratio, while images will be shown as they are'),
+            ]);
+
+            if ($this->MediaType === 'video') {
+                $fields->addFieldsToTab('Root.VideoEmbeddedData', [
+                    ReadonlyField::create('MediaVideoEmbeddedURL', 'Shortened URL'),
+                    ReadonlyField::create('MediaVideoProvider', 'Video provider'),
+                    ReadonlyField::create('MediaVideoEmbeddedName', 'Embedded name'),
+                    ReadonlyField::create('MediaVideoEmbeddedDescription', 'Embedded description'),
+                    ReadonlyField::create('MediaVideoEmbeddedThumbnail', 'Embedded thumbnail URL'),
+                    FieldGroup::create([
+                        LiteralField::create('MediaVideoEmbeddedThumbnailPreview', '<img src="' . $this->MediaVideoEmbeddedThumbnail . '">', 'Embedded thumbnail'),
+                    ])->setTitle('Video Thumbnail'),
+                    ReadonlyField::create('MediaVideoEmbeddedCreated', 'Embedded publication date'),
+                ]);
+            }
+        });
+
+        return parent::getCMSFields();
     }
 
     public function BulmaRatio(): ?string
