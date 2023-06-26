@@ -89,7 +89,7 @@ class ElementalMedia extends BaseElement
 
     public function getCMSFields(): FieldList
     {
-        this->beforeUpdateCMSFields(function (FieldList $fields) {
+        $this->beforeUpdateCMSFields(function (FieldList $fields) {
             $fields->removeByName([
                 'MediaType',
                 'MediaCaption',
