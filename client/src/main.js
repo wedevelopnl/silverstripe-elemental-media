@@ -14,20 +14,33 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     // GET DATA
-    const { videoType, videoEmbedUrl, elementId } = videoWrapper.dataset;
+    const {
+      videoType,
+      videoEmbedUrl,
+      elementId,
+      loopVideo,
+      autoplayVideo,
+    } = videoWrapper.dataset;
 
-    if (videoType === 'YouTube') {
+    if (autoplayVideo === '1') {
+      videoOverlay.classList.add('is-hidden', 'd-none');
+    }
+
+    if (videoType.toLowerCase() === 'youtube') {
       // GET VIDEO ID
       const videoID = videoEmbedUrl.substring(
         videoEmbedUrl.indexOf('embed/') + 6,
         videoEmbedUrl.lastIndexOf('?feature'),
       );
-
       // REPLACE DIV FOR VIDEO
       const playerYT = new YouTubePlayer(`player-${elementId}`, {
         videoId: videoID,
         playerVars: {
           playsinline: 1,
+          loop: loopVideo,
+          playlist: videoID,
+          mute: autoplayVideo,
+          autoplay: autoplayVideo,
         },
       });
 
@@ -37,16 +50,19 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    if (videoType === 'Vimeo') {
+    if (videoType.toLowerCase() === 'vimeo') {
       // GET VIDEO ID
       const videoID = videoEmbedUrl.substring(
         videoEmbedUrl.indexOf('video/') + 6,
-        videoEmbedUrl.lastIndexOf('?h='),
+        videoEmbedUrl.lastIndexOf('?app_id='),
       );
 
       // REPLACE DIV FOR VIDEO
       const videoOptions = {
         id: videoID,
+        loop: loopVideo,
+        muted: autoplayVideo,
+        autoplay: autoplayVideo,
       };
       const player = new Player(`player-${elementId}`, videoOptions);
 
