@@ -15,14 +15,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
     // GET DATA
     const { videoType, videoEmbedUrl, elementId } = videoWrapper.dataset;
+    const videoIDMatch = /(?:\/)([0-9]+)/.exec(videoEmbedUrl);
+    if (!videoIDMatch) {
+      return;
+    }
+    const videoID = videoIDMatch[1];
 
     if (videoType === 'YouTube') {
-      // GET VIDEO ID
-      const videoID = videoEmbedUrl.substring(
-        videoEmbedUrl.indexOf('embed/') + 6,
-        videoEmbedUrl.lastIndexOf('?feature'),
-      );
-
       // REPLACE DIV FOR VIDEO
       const playerYT = new YouTubePlayer(`player-${elementId}`, {
         videoId: videoID,
@@ -38,12 +37,6 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     if (videoType === 'Vimeo') {
-      // GET VIDEO ID
-      const videoID = videoEmbedUrl.substring(
-        videoEmbedUrl.indexOf('video/') + 6,
-        videoEmbedUrl.lastIndexOf('?h='),
-      );
-
       // REPLACE DIV FOR VIDEO
       const videoOptions = {
         id: videoID,
