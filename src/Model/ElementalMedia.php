@@ -54,18 +54,21 @@ class ElementalMedia extends BaseElement
     /** @config */
     private static array $db = [
         'MediaType' => 'Varchar(5)',
-        'MediaCaption' => 'Varchar(255)',
+        'MediaCaption' => 'Varchar',
         'MediaRatio' => 'Varchar(10)',
 
-        'MediaVideoFullURL' => 'Varchar(255)',
+        'MediaVideoFullURL' => 'Varchar',
         'MediaVideoProvider' => 'Varchar(10)',
-        'MediaVideoHasOverlay' => 'Boolean(false)',
+        'MediaVideoHasOverlay' => 'Boolean',
 
-        'MediaVideoEmbeddedName' => 'Varchar(255)',
-        'MediaVideoEmbeddedURL' => 'Varchar(255)',
+        'MediaVideoEmbeddedName' => 'Varchar',
+        'MediaVideoEmbeddedURL' => 'Varchar',
         'MediaVideoEmbeddedDescription' => 'Text',
-        'MediaVideoEmbeddedThumbnail' => 'Varchar(255)',
-        'MediaVideoEmbeddedCreated' => 'Varchar(255)',
+        'MediaVideoEmbeddedThumbnail' => 'Varchar',
+        'MediaVideoEmbeddedCreated' => 'Varchar',
+
+        'LoopVideo' => 'Boolean',
+        'AutoplayVideo' => 'Boolean',
     ];
 
     /** @config */
@@ -106,6 +109,9 @@ class ElementalMedia extends BaseElement
                 'MediaVideoEmbeddedDescription',
                 'MediaVideoEmbeddedThumbnail',
                 'MediaVideoEmbeddedCreated',
+
+                'LoopVideo',
+                'AutoplayVideo',
             ]);
 
             $mediaField = MediaField::create($fields);
@@ -114,6 +120,9 @@ class ElementalMedia extends BaseElement
                 UploadField::create('MediaVideoCustomThumbnail', 'Custom video thumbnail')
                     ->setFolderName('MediaUploads')
                     ->setDescription('This overwrites the default thumbnail provided by youtube or vimeo'),
+                CheckboxField::create('LoopVideo', 'Loop the video'),
+                CheckboxField::create('AutoplayVideo', 'Autoplay the video')
+                    ->setDescription('Setting autoplay will mute the video'),
             );
 
             $fields->addFieldsToTab('Root.Main', [
@@ -161,6 +170,7 @@ class ElementalMedia extends BaseElement
         if ($this->MediaType === 'video' && $this->MediaVideoFullURL) {
             $this->MediaVideoFullURL = trim($this->MediaVideoFullURL);
             MediaField::saveEmbed($this);
+
         }
     }
 
