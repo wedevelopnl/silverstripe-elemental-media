@@ -1,6 +1,7 @@
 {
     "name": "wedevelopnl/silverstripe-elemental-media",
     "description": "Elemental media module",
+    "type": "silverstripe-vendormodule",
     "keywords": [
         "silverstripe",
         "elemental",
